@@ -7,15 +7,26 @@ local Mover = require("aa-perfection/core/mover")
 local TargetFrame = {
     window = nil,
     hpBar = nil,
-    mpBar = nil,
     nameLabel = nil,
     infoLabel = nil,
     hpLabel = nil,
-    distLabel = nil
+    distLabel = nil,
+    levelLabel = nil
 }
 
-local WIDTH = 220
-local HEIGHT = 54
+local WIDTH = 224
+local HEIGHT = 56
+
+local function formatThousands(n)
+    local num = math.floor(tonumber(n) or 0)
+    local formatted = tostring(num)
+    local k
+    while true do
+        formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+        if k == 0 then break end
+    end
+    return formatted
+end
 
 function TargetFrame:Init()
     -- Suppress stock target frame
@@ -31,43 +42,50 @@ function TargetFrame:Init()
     wnd:AddAnchor("TOPLEFT", "UIParent", x, y)
     wnd:SetUILayer("game")
 
-    Theme.ApplyBackdrop(wnd, Theme.Colors.BgDark, Theme.Colors.BorderSubtle)
+    Theme.ApplyBackdrop(wnd, { 0.08, 0.09, 0.12, 0.94 }, Theme.Colors.BorderSubtle)
     Theme.ApplyBorder(wnd, Theme.Colors.BorderActive)
 
-    -- Name
+    -- Level Tag
+    local lvl = wnd:CreateChildWidget("label", "level", 0, true)
+    lvl:SetExtent(24, 16)
+    lvl:AddAnchor("TOPLEFT", wnd, 8, 4)
+    Theme.StyleLabel(lvl, 11, ALIGN.LEFT, Theme.Colors.TextGold, true)
+    self.levelLabel = lvl
+
+    -- Target Name
     local name = wnd:CreateChildWidget("label", "name", 0, true)
     name:SetExtent(130, 16)
-    name:AddAnchor("TOPLEFT", wnd, 6, 4)
+    name:AddAnchor("LEFT", lvl, "RIGHT", 4, 0)
     Theme.StyleLabel(name, 12, ALIGN.LEFT, Theme.Colors.TextPrimary, true)
     self.nameLabel = name
 
-    -- Distance & Class / GS
+    -- Distance (Top Right)
     local dist = wnd:CreateChildWidget("label", "dist", 0, true)
-    dist:SetExtent(70, 16)
-    dist:AddAnchor("TOPRIGHT", wnd, -6, 4)
+    dist:SetExtent(56, 16)
+    dist:AddAnchor("TOPRIGHT", wnd, -8, 4)
     Theme.StyleLabel(dist, 10, ALIGN.RIGHT, Theme.Colors.TextGold, true)
     self.distLabel = dist
 
-    -- Health Bar
+    -- Health Bar (Flat solid texture)
     local hp = W_BAR.CreateStatusBarOfRaidFrame("pui_target_hp", wnd)
-    hp:SetExtent(WIDTH - 12, 18)
-    hp:AddAnchor("TOPLEFT", wnd, 6, 22)
+    hp:SetExtent(WIDTH - 16, 20)
+    hp:AddAnchor("TOPLEFT", wnd, 8, 22)
     hp:Clickable(false)
-    hp.statusBar:SetBarTexture(TEXTURE_PATH.HUD, "background")
+    hp.statusBar:SetBarTexture("Textures/Defaults/White.dds", "background")
     hp.statusBar:SetBarColor(Theme.Colors.HealthHostile[1], Theme.Colors.HealthHostile[2], Theme.Colors.HealthHostile[3], 1)
     hp.statusBar:SetMinMaxValues(0, 100)
     hp.statusBar:SetValue(100)
     self.hpBar = hp
 
     local hpText = hp:CreateChildWidget("label", "hpText", 0, true)
-    hpText:SetExtent(WIDTH - 20, 16)
+    hpText:SetExtent(WIDTH - 24, 18)
     hpText:AddAnchor("CENTER", hp, 0, 0)
     Theme.StyleLabel(hpText, 10, ALIGN.CENTER, Theme.Colors.TextPrimary, true)
     self.hpLabel = hpText
 
     -- Class & GS Subtitle below HP
     local info = wnd:CreateChildWidget("label", "info", 0, true)
-    info:SetExtent(WIDTH - 12, 12)
+    info:SetExtent(WIDTH - 16, 10)
     info:AddAnchor("TOPLEFT", hp, "BOTTOMLEFT", 0, 2)
     Theme.StyleLabel(info, 9, ALIGN.LEFT, Theme.Colors.TextSecondary, true)
     self.infoLabel = info
@@ -78,19 +96,23 @@ function TargetFrame:Init()
 end
 
 function TargetFrame:Update()
+    if self.window == nil then return end
+
     local targetId = Guard.GetUnitId("target")
     if targetId == nil then
         self.window:Show(false)
         return
     end
 
-    self.window:Show(true)
-    local curHp = Guard.UnitHealth("target")
-    local maxHp = Guard.UnitMaxHealth("target")
-    local name = Guard.UnitName("target")
-    local className = Guard.UnitClass("target")
+    local curHp = Guard.UnitHealth("target") or 0
+    local maxHp = Guard.UnitMaxHealth("target") or 1
+    if maxHp < 1 then maxHp = 1 end
+
+    local name = Guard.UnitName("target") or ""
+    local className = Guard.UnitClass("target") or ""
     local gs = Guard.UnitGearScore("target")
     local dist = Guard.UnitDistance("target")
+    local level = Guard.UnitLevel("target")
     local isHostile = Guard.UnitIsForceAttack("target")
 
     -- Reactive Color: Red for Hostile, Cyan for Friendly
@@ -104,18 +126,32 @@ function TargetFrame:Update()
     self.hpBar.statusBar:SetValue(curHp)
 
     local pct = math.floor((curHp / maxHp) * 100)
-    self.hpLabel:SetText(string.format("%d / %d (%d%%)", curHp, maxHp, pct))
+    self.hpLabel:SetText(string.format("%s / %s (%d%%)", formatThousands(curHp), formatThousands(maxHp), pct))
     self.nameLabel:SetText(name)
 
-    if dist then
+    if self.levelLabel then
+        if level and tonumber(level) then
+            self.levelLabel:SetText(tostring(level))
+            self.levelLabel:Show(true)
+        else
+            self.levelLabel:SetText("")
+            self.levelLabel:Show(false)
+        end
+    end
+
+    if dist and dist >= 0 then
         self.distLabel:SetText(string.format("%.1fm", dist))
     else
         self.distLabel:SetText("")
     end
 
-    local gsStr = gs > 0 and (tostring(gs) .. " GS") or ""
-    local classStr = className ~= "" and className or "Target"
-    self.infoLabel:SetText(classStr .. (gsStr ~= "" and (" | " .. gsStr) or ""))
+    -- Format Class and GearScore line
+    local details = {}
+    if className ~= "" then table.insert(details, className) end
+    if gs and gs > 0 then table.insert(details, string.format("%d GS", gs)) end
+    self.infoLabel:SetText(table.concat(details, "  •  "))
+
+    self.window:Show(true)
 end
 
 return TargetFrame

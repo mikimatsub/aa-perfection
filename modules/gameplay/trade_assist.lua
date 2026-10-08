@@ -9,16 +9,17 @@ local TradeAssist = {
 
 function TradeAssist:Init()
     local wnd = api.Interface:CreateEmptyWindow("pui_trade_assist", "UIParent")
-    wnd:SetExtent(160, 24)
+    wnd:SetExtent(180, 26)
     wnd:AddAnchor("TOP", "UIParent", 0, 50)
     wnd:SetUILayer("hud")
 
     Theme.ApplyBackdrop(wnd, Theme.Colors.BgDark, Theme.Colors.BorderSubtle)
+    Theme.ApplyBorder(wnd, Theme.Colors.BorderActive)
 
     local lbl = wnd:CreateChildWidget("label", "text", 0, true)
-    lbl:SetExtent(150, 20)
+    lbl:SetExtent(170, 20)
     lbl:AddAnchor("CENTER", wnd, 0, 0)
-    Theme.StyleLabel(lbl, 10, ALIGN.CENTER, Theme.Colors.GoldCurrency, true)
+    Theme.StyleLabel(lbl, 10, ALIGN.CENTER, Theme.Colors.TextGold, true)
     self.label = lbl
 
     self.window = wnd
@@ -26,12 +27,18 @@ function TradeAssist:Init()
 end
 
 function TradeAssist:Update()
-    -- Check if back slot has a trade pack
+    if self.window == nil then return end
+
+    -- Check if back slot has an ACTUAL trade pack (not glider, not cloak)
     local hasPack = false
     if api.Equipment ~= nil and EQUIP_SLOT ~= nil and EQUIP_SLOT.BACKPACK ~= nil then
         local tip = Guard.SafePcall(function() return api.Equipment:GetEquippedItemTooltipInfo(EQUIP_SLOT.BACKPACK) end)
         if type(tip) == "table" then
-            hasPack = true
+            local name = tostring(tip.name or tip.linkText or ""):lower()
+            local cat = tostring(tip.category or ""):lower()
+            if name:find("pack") or name:find("specialty") or name:find("cargo") or cat:find("trade") or cat:find("specialty") then
+                hasPack = true
+            end
         end
     end
 

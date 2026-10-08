@@ -15,6 +15,7 @@ local BarSkinner = require("aa-perfection/modules/actionbars/bar_skinner")
 local CastBar = require("aa-perfection/modules/combat_hud/castbar")
 local CCTracker = require("aa-perfection/modules/combat_hud/cc_tracker")
 local ComboHUD = require("aa-perfection/modules/combat_hud/combo_hud")
+local TargetNameplate = require("aa-perfection/modules/combat_hud/target_nameplate")
 local PlayerFrame = require("aa-perfection/modules/unitframes/player_frame")
 local TargetFrame = require("aa-perfection/modules/unitframes/target_frame")
 local SecondaryFrames = require("aa-perfection/modules/unitframes/secondary")
@@ -85,6 +86,7 @@ local function OnLoad()
     Logger:Try("CastBar:Init", function() CastBar:Init() end)
     Logger:Try("CCTracker:Init", function() CCTracker:Init() end)
     Logger:Try("ComboHUD:Init", function() ComboHUD:Init() end)
+    Logger:Try("TargetNameplate:Init", function() TargetNameplate:Init() end)
     Logger:Try("PlayerFrame:Init", function() PlayerFrame:Init() end)
     Logger:Try("TargetFrame:Init", function() TargetFrame:Init() end)
     Logger:Try("SecondaryFrames:Init", function() SecondaryFrames:Init() end)
@@ -97,10 +99,15 @@ local function OnLoad()
     Logger:Try("QuestTracker:Init", function() QuestTracker:Init() end)
     Logger:Try("ChatStyler:Init", function() ChatStyler:Init() end)
 
-    -- High-frequency ticker (16ms = ~60 FPS): Castbar & Speedometer
+    -- High-frequency ticker (16ms = ~60 FPS): Castbar, Speedometer, and 3D Target Nameplate
     Events:RegisterTicker("fast_hud", 16, function(dt)
-        if Settings:IsModuleEnabled("combat_hud") then CastBar:Update(dt) end
-        if Settings:IsModuleEnabled("gameplay") then SpeedGlider:Update(dt) end
+        if Settings:IsModuleEnabled("combat_hud") then
+            CastBar:Update(dt)
+            TargetNameplate:Update()
+        end
+        if Settings:IsModuleEnabled("gameplay") then
+            SpeedGlider:Update(dt)
+        end
     end)
 
     -- Medium-frequency ticker (50ms = ~20 FPS): Unit frames, combat HUD, and auras

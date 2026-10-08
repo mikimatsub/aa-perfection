@@ -113,18 +113,18 @@ function Theme.StyleLabel(label, fontSize, align, color, shadow)
     end
 end
 
--- Formats a gold amount into G / S / C string
+-- Formats a copper amount into clean G / S / C string
 function Theme.FormatMoney(amount)
     local copper = math.floor(tonumber(amount) or 0)
-    if copper <= 0 then return "0|cFFFFD700g|r" end
+    if copper <= 0 then return "0g 00s 00c" end
     local g = math.floor(copper / 10000)
     local s = math.floor((copper % 10000) / 100)
     local c = copper % 100
 
     local parts = {}
-    if g > 0 then table.insert(parts, string.format("%d|cFFFFD700g|r", g)) end
-    if s > 0 or g > 0 then table.insert(parts, string.format("%02d|cFFC0C0C0s|r", s)) end
-    table.insert(parts, string.format("%02d|cFFB87333c|r", c))
+    if g > 0 then table.insert(parts, string.format("%dg", g)) end
+    if s > 0 or g > 0 then table.insert(parts, string.format("%02ds", s)) end
+    table.insert(parts, string.format("%02dc", c))
     return table.concat(parts, " ")
 end
 

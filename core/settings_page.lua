@@ -49,9 +49,9 @@ function SettingsPage:Init()
 
     -- Modules List
     local modules = {
-        { id = "inventory",   label = "Next-Gen Categorized Inventory", desc = "Smart categories, item search, & gold counter" },
+        { id = "inventory",   label = "Obsidian Bag Styling",           desc = "Dark obsidian theme on native bags" },
         { id = "unitframes",  label = "Obsidian Unit Frames",           desc = "Player & Target frames with health/mana" },
-        { id = "combat_hud",  label = "Combat HUD & Cast Bar",          desc = "Animated spell cast bar & CC alert banner" },
+        { id = "combat_hud",  label = "Combat HUD & 3D Target Plate",   desc = "Cast bar, CC alerts, & 3D overhead plate" },
         { id = "actionbars",  label = "Quick Swap Loadout Bar",         desc = "Floating situational weapon quick-swap" },
         { id = "gameplay",    label = "Labor HUD & Speedometer",        desc = "Live labor power bar & mount/glider speed" },
         { id = "chat",        label = "Chat Tab Enhancements",          desc = "Obsidian styling for chat windows" }

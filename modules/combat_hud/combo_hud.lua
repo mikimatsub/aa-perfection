@@ -23,9 +23,8 @@ function ComboHUD:Init()
         orb:SetExtent(20, 16)
         orb:AddAnchor("LEFT", wnd, (i - 1) * 28 + 6, 0)
         
-        local bg = orb:CreateNinePartDrawable(TEXTURE_PATH.HUD, "background")
-        bg:SetCoords(301, 120, 150, 19)
-        bg:SetColor(0.2, 0.2, 0.3, 0.6)
+        local bg = orb:CreateImageDrawable("Textures/Defaults/White.dds", "background")
+        bg:SetColor(0.15, 0.18, 0.25, 0.8)
         bg:AddAnchor("TOPLEFT", orb, 0, 0)
         bg:AddAnchor("BOTTOMRIGHT", orb, 0, 0)
         orb.bg = bg

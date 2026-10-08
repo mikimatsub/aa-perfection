@@ -14,11 +14,22 @@ local PlayerFrame = {
     levelLabel = nil
 }
 
-local WIDTH = 220
-local HEIGHT = 54
+local WIDTH = 224
+local HEIGHT = 56
+
+local function formatThousands(n)
+    local num = math.floor(tonumber(n) or 0)
+    local formatted = tostring(num)
+    local k
+    while true do
+        formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+        if k == 0 then break end
+    end
+    return formatted
+end
 
 function PlayerFrame:Init()
-    -- Suppress stock player frame
+    -- Suppress stock player frame to avoid duplicates
     local stockPlayer = Guard.GetStockContent(UIC.PLAYER_UNITFRAME)
     if stockPlayer ~= nil then
         pcall(function() stockPlayer:Show(false) end)
@@ -31,45 +42,47 @@ function PlayerFrame:Init()
     wnd:AddAnchor("TOPLEFT", "UIParent", x, y)
     wnd:SetUILayer("game")
 
-    Theme.ApplyBackdrop(wnd, Theme.Colors.BgDark, Theme.Colors.BorderSubtle)
+    -- Solid Apex Obsidian Backdrop & 1px Hairline Border
+    Theme.ApplyBackdrop(wnd, { 0.08, 0.09, 0.12, 0.94 }, Theme.Colors.BorderSubtle)
     Theme.ApplyBorder(wnd, Theme.Colors.BorderActive)
 
-    -- Level & Name
+    -- Level Tag
     local lvl = wnd:CreateChildWidget("label", "level", 0, true)
-    lvl:SetExtent(28, 16)
-    lvl:AddAnchor("TOPLEFT", wnd, 6, 4)
+    lvl:SetExtent(24, 16)
+    lvl:AddAnchor("TOPLEFT", wnd, 8, 4)
     Theme.StyleLabel(lvl, 11, ALIGN.LEFT, Theme.Colors.TextGold, true)
     self.levelLabel = lvl
 
+    -- Character Name
     local name = wnd:CreateChildWidget("label", "name", 0, true)
-    name:SetExtent(160, 16)
+    name:SetExtent(170, 16)
     name:AddAnchor("LEFT", lvl, "RIGHT", 4, 0)
     Theme.StyleLabel(name, 12, ALIGN.LEFT, Theme.Colors.TextPrimary, true)
     self.nameLabel = name
 
-    -- Health Bar
+    -- Health Bar (Flat solid texture)
     local hp = W_BAR.CreateStatusBarOfRaidFrame("pui_player_hp", wnd)
-    hp:SetExtent(WIDTH - 12, 18)
-    hp:AddAnchor("TOPLEFT", wnd, 6, 22)
+    hp:SetExtent(WIDTH - 16, 20)
+    hp:AddAnchor("TOPLEFT", wnd, 8, 22)
     hp:Clickable(false)
-    hp.statusBar:SetBarTexture(TEXTURE_PATH.HUD, "background")
+    hp.statusBar:SetBarTexture("Textures/Defaults/White.dds", "background")
     hp.statusBar:SetBarColor(Theme.Colors.HealthPlayer[1], Theme.Colors.HealthPlayer[2], Theme.Colors.HealthPlayer[3], 1)
     hp.statusBar:SetMinMaxValues(0, 100)
     hp.statusBar:SetValue(100)
     self.hpBar = hp
 
     local hpText = hp:CreateChildWidget("label", "hpText", 0, true)
-    hpText:SetExtent(WIDTH - 20, 16)
+    hpText:SetExtent(WIDTH - 24, 18)
     hpText:AddAnchor("CENTER", hp, 0, 0)
     Theme.StyleLabel(hpText, 10, ALIGN.CENTER, Theme.Colors.TextPrimary, true)
     self.hpLabel = hpText
 
-    -- Mana Bar
+    -- Mana Bar (Flat solid texture)
     local mp = W_BAR.CreateStatusBarOfRaidFrame("pui_player_mp", wnd)
-    mp:SetExtent(WIDTH - 12, 6)
+    mp:SetExtent(WIDTH - 16, 7)
     mp:AddAnchor("TOPLEFT", hp, "BOTTOMLEFT", 0, 2)
     mp:Clickable(false)
-    mp.statusBar:SetBarTexture(TEXTURE_PATH.HUD, "background")
+    mp.statusBar:SetBarTexture("Textures/Defaults/White.dds", "background")
     mp.statusBar:SetBarColor(Theme.Colors.ManaPower[1], Theme.Colors.ManaPower[2], Theme.Colors.ManaPower[3], 1)
     mp.statusBar:SetMinMaxValues(0, 100)
     mp.statusBar:SetValue(100)
@@ -81,6 +94,8 @@ function PlayerFrame:Init()
 end
 
 function PlayerFrame:Update()
+    if self.window == nil then return end
+
     local curHp = Guard.UnitHealth("player") or 100
     local maxHp = Guard.UnitMaxHealth("player") or 100
     local curMp = Guard.UnitMana("player") or 100
@@ -98,10 +113,17 @@ function PlayerFrame:Update()
     self.mpBar.statusBar:SetValue(curMp)
 
     local pct = math.floor((curHp / maxHp) * 100)
-    self.hpLabel:SetText(string.format("%d / %d (%d%%)", curHp, maxHp, pct))
+    self.hpLabel:SetText(string.format("%s / %s (%d%%)", formatThousands(curHp), formatThousands(maxHp), pct))
     self.nameLabel:SetText(playerName)
-    if self.levelLabel and level then
-        self.levelLabel:SetText(tostring(level))
+
+    if self.levelLabel then
+        if level and tonumber(level) then
+            self.levelLabel:SetText(tostring(level))
+            self.levelLabel:Show(true)
+        else
+            self.levelLabel:SetText("")
+            self.levelLabel:Show(false)
+        end
     end
 end
 

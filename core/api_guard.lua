@@ -59,6 +59,42 @@ function Guard.GetUnitId(unit)
     return Guard.SafePcall(function() return api.Unit:GetUnitId(u) end, nil)
 end
 
+function Guard.UnitLevel(unit)
+    local u = sanitizeUnit(unit)
+    if not u or api.Unit == nil then return nil end
+    local ok, lvl = pcall(function()
+        if api.Unit.UnitLevel ~= nil then
+            return api.Unit:UnitLevel(u)
+        end
+        if api.Unit.GetUnitLevel ~= nil then
+            return api.Unit:GetUnitLevel(u)
+        end
+        local uid = api.Unit:GetUnitId(u)
+        if uid ~= nil and api.Unit.GetUnitInfoById ~= nil then
+            local info = api.Unit:GetUnitInfoById(uid)
+            if info ~= nil and info.level ~= nil then
+                return info.level
+            end
+        end
+        if u == "player" and api.Player ~= nil and api.Player.GetLevel ~= nil then
+            return api.Player:GetLevel()
+        end
+        return nil
+    end)
+    if ok and lvl ~= nil and tonumber(lvl) then
+        return tonumber(lvl)
+    end
+    return nil
+end
+
+function Guard.UnitScreenPosition(unit)
+    local u = sanitizeUnit(unit)
+    if not u or api.Unit == nil or api.Unit.GetUnitScreenPosition == nil then return nil, nil, nil end
+    local ok, sx, sy, sz = pcall(function() return api.Unit:GetUnitScreenPosition(u) end)
+    if ok and sx ~= nil then return sx, sy, sz end
+    return nil, nil, nil
+end
+
 function Guard.UnitDistance(unit)
     local u = sanitizeUnit(unit)
     if not u or api.Unit == nil or api.Unit.UnitDistance == nil then return nil end
