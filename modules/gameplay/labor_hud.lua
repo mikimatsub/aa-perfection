@@ -55,15 +55,32 @@ function LaborHUD:Init()
 end
 
 function LaborHUD:Update()
-    -- Query player game points or labor
-    local labor = 5000
+    local curLabor = 5000
+    local maxLabor = 5000
+
     if api.Player ~= nil and api.Player.GetGamePoints ~= nil then
-        local pts = api.Player:GetGamePoints()
-        if pts ~= nil then labor = pts end
+        local ok, pts = pcall(function() return api.Player:GetGamePoints() end)
+        if ok and pts ~= nil then
+            if type(pts) == "table" then
+                curLabor = pts.laborPower or pts.labor_power or pts.point or pts.cur or pts.current or pts[1] or 5000
+                maxLabor = pts.maxLaborPower or pts.max_labor_power or pts.maxPoint or pts.max or pts[2] or 5000
+            elseif type(pts) == "number" then
+                curLabor = pts
+            end
+        end
     end
 
-    self.bar.statusBar:SetValue(labor)
-    self.laborText:SetText(string.format("%d / 5000 LP", labor))
+    curLabor = tonumber(curLabor) or 5000
+    maxLabor = tonumber(maxLabor) or 5000
+    if maxLabor < 1 then maxLabor = 5000 end
+
+    if self.bar and self.bar.statusBar then
+        self.bar.statusBar:SetMinMaxValues(0, maxLabor)
+        self.bar.statusBar:SetValue(curLabor)
+    end
+    if self.laborText then
+        self.laborText:SetText(string.format("%d / %d LP", curLabor, maxLabor))
+    end
 end
 
 return LaborHUD

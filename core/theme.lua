@@ -52,33 +52,48 @@ Theme.Colors = {
 
 Theme.HexToRGBA = HexToRGBA
 
--- Creates an Obsidian sleek panel backdrop on any window/widget
+-- Creates an Obsidian sleek solid panel backdrop on any window/widget
 function Theme.ApplyBackdrop(widget, bgColor, borderColor)
     if widget == nil then return nil end
-    local bg = widget:CreateNinePartDrawable(TEXTURE_PATH.HUD, "background")
-    bg:SetCoords(301, 120, 150, 19)
-    bg:SetInset(6, 6, 6, 6)
-    
+    local bg = widget:CreateImageDrawable("Textures/Defaults/White.dds", "background")
     local c = bgColor or Theme.Colors.BgDark
-    bg:SetColor(c[1], c[2], c[3], c[4])
+    bg:SetColor(c[1], c[2], c[3], c[4] or 0.94)
     bg:AddAnchor("TOPLEFT", widget, 0, 0)
     bg:AddAnchor("BOTTOMRIGHT", widget, 0, 0)
     widget.__pui_bg = bg
     return bg
 end
 
--- Creates an edge border overlay
+-- Creates a sleek subtle 1px border around a frame
 function Theme.ApplyBorder(widget, borderColor)
     if widget == nil then return nil end
-    local border = widget:CreateNinePartDrawable(TEXTURE_PATH.HUD, "overlay")
-    border:SetCoords(79, 203, 18, 23)
-    border:SetInset(4, 4, 4, 4)
     local bc = borderColor or Theme.Colors.BorderSubtle
-    border:SetColor(bc[1], bc[2], bc[3], bc[4])
-    border:AddAnchor("TOPLEFT", widget, -1, -1)
-    border:AddAnchor("BOTTOMRIGHT", widget, 1, 1)
-    widget.__pui_border = border
-    return border
+    -- Top border
+    local top = widget:CreateImageDrawable("Textures/Defaults/White.dds", "overlay")
+    top:SetColor(bc[1], bc[2], bc[3], bc[4] or 1.0)
+    top:AddAnchor("TOPLEFT", widget, 0, 0)
+    top:AddAnchor("BOTTOMRIGHT", widget, "TOPRIGHT", 0, 1)
+
+    -- Bottom border
+    local bot = widget:CreateImageDrawable("Textures/Defaults/White.dds", "overlay")
+    bot:SetColor(bc[1], bc[2], bc[3], bc[4] or 1.0)
+    bot:AddAnchor("TOPLEFT", widget, "BOTTOMLEFT", 0, -1)
+    bot:AddAnchor("BOTTOMRIGHT", widget, 0, 0)
+
+    -- Left border
+    local left = widget:CreateImageDrawable("Textures/Defaults/White.dds", "overlay")
+    left:SetColor(bc[1], bc[2], bc[3], bc[4] or 1.0)
+    left:AddAnchor("TOPLEFT", widget, 0, 0)
+    left:AddAnchor("BOTTOMRIGHT", widget, "BOTTOMLEFT", 1, 0)
+
+    -- Right border
+    local right = widget:CreateImageDrawable("Textures/Defaults/White.dds", "overlay")
+    right:SetColor(bc[1], bc[2], bc[3], bc[4] or 1.0)
+    right:AddAnchor("TOPLEFT", widget, "TOPRIGHT", -1, 0)
+    right:AddAnchor("BOTTOMRIGHT", widget, 0, 0)
+
+    widget.__pui_borders = { top, bot, left, right }
+    return top
 end
 
 -- Sets font formatting cleanly

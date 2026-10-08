@@ -6,82 +6,125 @@ local Mover = require("aa-perfection/core/mover")
 local SettingsPage = {
     window = nil,
     isOpen = false,
-    moduleCheckboxes = {}
+    moduleRows = {}
 }
 
-local WIDTH = 340
-local HEIGHT = 380
-local PADDING = 14
+local WIDTH = 440
+local HEIGHT = 480
+local PADDING = 16
 
 function SettingsPage:Init()
     local wnd = api.Interface:CreateEmptyWindow("pui_settings_window", "UIParent")
     wnd:SetExtent(WIDTH, HEIGHT)
-    wnd:AddAnchor("CENTER", "UIParent", 0, 0)
+    wnd:AddAnchor("CENTER", "UIParent", 0, -30)
     wnd:SetUILayer("dialog")
 
-    Theme.ApplyBackdrop(wnd, Theme.Colors.BgDark, Theme.Colors.BorderSubtle)
-    Theme.ApplyBorder(wnd, Theme.Colors.BorderActive)
+    -- Solid dark obsidian backdrop with gold border
+    Theme.ApplyBackdrop(wnd, { 0.07, 0.08, 0.11, 0.98 })
+    Theme.ApplyBorder(wnd, Theme.Colors.BorderAccent)
 
-    -- Header
+    -- Header Title
     local title = wnd:CreateChildWidget("label", "title", 0, true)
+    title:SetExtent(WIDTH - 80, 20)
     title:SetText("PERFECTION UI - SETTINGS")
     Theme.StyleLabel(title, 13, ALIGN.LEFT, Theme.Colors.TextGold, true)
     title:AddAnchor("TOPLEFT", wnd, PADDING, PADDING)
 
+    local subTitle = wnd:CreateChildWidget("label", "subTitle", 0, true)
+    subTitle:SetExtent(WIDTH - 80, 14)
+    subTitle:SetText("MODULE CONFIGURATION & CONTROLS")
+    Theme.StyleLabel(subTitle, 9, ALIGN.LEFT, Theme.Colors.TextSecondary, true)
+    subTitle:AddAnchor("TOPLEFT", title, "BOTTOMLEFT", 0, 4)
+
+    -- Close Button
     local closeBtn = wnd:CreateChildWidget("button", "close", 0, true)
-    closeBtn:SetExtent(18, 18)
+    closeBtn:SetExtent(24, 24)
     closeBtn:AddAnchor("TOPRIGHT", wnd, -PADDING, PADDING)
     closeBtn:SetText("X")
-    Theme.StyleLabel(closeBtn, 12, ALIGN.CENTER, Theme.Colors.TextMuted, false)
+    Theme.StyleLabel(closeBtn, 12, ALIGN.CENTER, Theme.Colors.TextGold, true)
+    api.Interface:ApplyButtonSkin(closeBtn, BUTTON_BASIC.DEFAULT)
     closeBtn:SetHandler("OnClick", function()
         SettingsPage:Toggle()
     end)
 
-    -- Module Toggles Section
-    local subTitle = wnd:CreateChildWidget("label", "subTitle", 0, true)
-    subTitle:SetText("MODULE CONFIGURATION")
-    Theme.StyleLabel(subTitle, 10, ALIGN.LEFT, Theme.Colors.TextSecondary, true)
-    subTitle:AddAnchor("TOPLEFT", title, "BOTTOMLEFT", 0, 10)
-
+    -- Modules List
     local modules = {
-        { id = "inventory",   label = "Next-Gen Inventory (Bag)" },
-        { id = "unitframes",  label = "Obsidian Unit Frames (Player/Target)" },
-        { id = "combat_hud",  label = "Combat HUD (Castbar & CC Alert)" },
-        { id = "actionbars",  label = "Quick Swap Bar & Action Skin" },
-        { id = "gameplay",    label = "Labor HUD & Speedometer" },
-        { id = "chat",        label = "Obsidian Chat Enhancements" }
+        { id = "inventory",   label = "Next-Gen Categorized Inventory", desc = "Smart categories, item search, & gold counter" },
+        { id = "unitframes",  label = "Obsidian Unit Frames",           desc = "Player & Target frames with health/mana" },
+        { id = "combat_hud",  label = "Combat HUD & Cast Bar",          desc = "Animated spell cast bar & CC alert banner" },
+        { id = "actionbars",  label = "Quick Swap Loadout Bar",         desc = "Floating situational weapon quick-swap" },
+        { id = "gameplay",    label = "Labor HUD & Speedometer",        desc = "Live labor power bar & mount/glider speed" },
+        { id = "chat",        label = "Chat Tab Enhancements",          desc = "Obsidian styling for chat windows" }
     }
 
-    local startY = PADDING + 16 + 10 + 14 + 8
+    local startY = PADDING + 20 + 4 + 14 + 12
+    local rowWidth = WIDTH - (PADDING * 2)
+
     for idx, mod in ipairs(modules) do
-        local posY = startY + ((idx - 1) * 28)
-        local chk = api.Interface:CreateWidget("checkbutton", "chk_" .. mod.id, wnd)
-        chk:AddAnchor("TOPLEFT", wnd, PADDING, posY)
-        chk:SetText(mod.label)
-        Theme.StyleLabel(chk.textButton, 10, ALIGN.LEFT, Theme.Colors.TextPrimary, false)
+        local posY = startY + ((idx - 1) * 36)
+        local row = wnd:CreateChildWidget("emptywidget", "row_" .. mod.id, 0, true)
+        row:SetExtent(rowWidth, 32)
+        row:AddAnchor("TOPLEFT", wnd, PADDING, posY)
+        Theme.ApplyBackdrop(row, { 0.11, 0.13, 0.18, 0.90 })
+        Theme.ApplyBorder(row, { 0.18, 0.22, 0.30, 0.80 })
+
+        local label = row:CreateChildWidget("label", "lbl", 0, true)
+        label:SetExtent(rowWidth - 90, 16)
+        label:AddAnchor("TOPLEFT", row, 8, 4)
+        label:SetText(mod.label)
+        Theme.StyleLabel(label, 10, ALIGN.LEFT, Theme.Colors.TextPrimary, true)
+
+        local descLbl = row:CreateChildWidget("label", "desc", 0, true)
+        descLbl:SetExtent(rowWidth - 90, 12)
+        descLbl:AddAnchor("TOPLEFT", label, "BOTTOMLEFT", 0, 1)
+        descLbl:SetText(mod.desc)
+        Theme.StyleLabel(descLbl, 8, ALIGN.LEFT, Theme.Colors.TextMuted, false)
+
+        -- High-visibility ON / OFF Toggle Pill
+        local toggleBtn = row:CreateChildWidget("button", "toggle", 0, true)
+        toggleBtn:SetExtent(74, 22)
+        toggleBtn:AddAnchor("RIGHT", row, -6, 0)
+        api.Interface:ApplyButtonSkin(toggleBtn, BUTTON_BASIC.DEFAULT)
+
+        local function updateToggleVisual(enabled)
+            if enabled then
+                toggleBtn:SetText("ON")
+                Theme.StyleLabel(toggleBtn, 10, ALIGN.CENTER, Theme.Colors.HealthPlayer, true)
+            else
+                toggleBtn:SetText("OFF")
+                Theme.StyleLabel(toggleBtn, 10, ALIGN.CENTER, Theme.Colors.TextMuted, false)
+            end
+        end
 
         local isEnabled = Settings:IsModuleEnabled(mod.id)
-        chk:SetChecked(isEnabled)
+        updateToggleVisual(isEnabled)
 
-        chk:SetHandler("OnCheckChanged", function(selfChk)
-            local checked = selfChk:IsChecked()
-            Settings:SetModuleEnabled(mod.id, checked)
+        toggleBtn:SetHandler("OnClick", function()
+            local newState = not Settings:IsModuleEnabled(mod.id)
+            Settings:SetModuleEnabled(mod.id, newState)
+            updateToggleVisual(newState)
         end)
 
-        self.moduleCheckboxes[mod.id] = chk
+        self.moduleRows[mod.id] = {
+            row = row,
+            toggleBtn = toggleBtn,
+            update = updateToggleVisual
+        }
     end
 
     -- Presets Section
+    local presetY = startY + (#modules * 36) + 12
     local presetLabel = wnd:CreateChildWidget("label", "presetLabel", 0, true)
+    presetLabel:SetExtent(rowWidth, 14)
     presetLabel:SetText("PERFORMANCE PRESETS")
-    Theme.StyleLabel(presetLabel, 10, ALIGN.LEFT, Theme.Colors.TextSecondary, true)
-    presetLabel:AddAnchor("TOPLEFT", wnd, PADDING, startY + (#modules * 28) + 10)
+    Theme.StyleLabel(presetLabel, 9, ALIGN.LEFT, Theme.Colors.TextSecondary, true)
+    presetLabel:AddAnchor("TOPLEFT", wnd, PADDING, presetY)
 
-    local presetY = startY + (#modules * 28) + 26
+    local btnY = presetY + 18
     local zergBtn = wnd:CreateChildWidget("button", "zergPreset", 0, true)
-    zergBtn:SetExtent(96, 24)
-    zergBtn:AddAnchor("TOPLEFT", wnd, PADDING, presetY)
-    zergBtn:SetText("Zerg / Raid")
+    zergBtn:SetExtent(120, 24)
+    zergBtn:AddAnchor("TOPLEFT", wnd, PADDING, btnY)
+    zergBtn:SetText("Zerg Mode")
     Theme.StyleLabel(zergBtn, 10, ALIGN.CENTER, Theme.Colors.TextPrimary, false)
     api.Interface:ApplyButtonSkin(zergBtn, BUTTON_BASIC.DEFAULT)
 
@@ -90,14 +133,14 @@ function SettingsPage:Init()
         Settings:SetModuleEnabled("chat", false)
         SettingsPage:RefreshCheckboxes()
         if api.Log ~= nil and api.Log.Info ~= nil then
-            api.Log:Info("[Perfection UI] Activated 'Zerg Mode' preset (max combat FPS).")
+            api.Log:Info("[Perfection UI] Activated 'Zerg Mode' (combat FPS priority).")
         end
     end)
 
     local defaultBtn = wnd:CreateChildWidget("button", "defaultPreset", 0, true)
-    defaultBtn:SetExtent(96, 24)
-    defaultBtn:AddAnchor("LEFT", zergBtn, "RIGHT", 8, 0)
-    defaultBtn:SetText("Balanced")
+    defaultBtn:SetExtent(120, 24)
+    defaultBtn:AddAnchor("LEFT", zergBtn, "RIGHT", 10, 0)
+    defaultBtn:SetText("Balanced Mode")
     Theme.StyleLabel(defaultBtn, 10, ALIGN.CENTER, Theme.Colors.TextPrimary, false)
     api.Interface:ApplyButtonSkin(defaultBtn, BUTTON_BASIC.DEFAULT)
 
@@ -107,29 +150,29 @@ function SettingsPage:Init()
         end
         SettingsPage:RefreshCheckboxes()
         if api.Log ~= nil and api.Log.Info ~= nil then
-            api.Log:Info("[Perfection UI] Activated 'Balanced' preset (all features enabled).")
+            api.Log:Info("[Perfection UI] Activated 'Balanced Mode' (all modules active).")
         end
     end)
 
-    -- Bottom Actions: Edit Mode & Reset
+    -- Bottom Actions: Edit Mode & Reset Layout
     local editBtn = wnd:CreateChildWidget("button", "editModeBtn", 0, true)
-    editBtn:SetExtent(144, 28)
+    editBtn:SetExtent(190, 28)
     editBtn:AddAnchor("BOTTOMLEFT", wnd, PADDING, -PADDING)
-    editBtn:SetText("Unlock Positions")
-    Theme.StyleLabel(editBtn, 10, ALIGN.CENTER, Theme.Colors.TextGold, false)
+    editBtn:SetText("Move / Unlock Frames")
+    Theme.StyleLabel(editBtn, 10, ALIGN.CENTER, Theme.Colors.TextGold, true)
     api.Interface:ApplyButtonSkin(editBtn, BUTTON_BASIC.DEFAULT)
 
     editBtn:SetHandler("OnClick", function()
         Mover:ToggleEditMode()
         if Mover.isUnlocked then
-            editBtn:SetText("Lock Positions")
+            editBtn:SetText("Lock Frames (Done)")
         else
-            editBtn:SetText("Unlock Positions")
+            editBtn:SetText("Move / Unlock Frames")
         end
     end)
 
     local resetBtn = wnd:CreateChildWidget("button", "resetBtn", 0, true)
-    resetBtn:SetExtent(144, 28)
+    resetBtn:SetExtent(190, 28)
     resetBtn:AddAnchor("BOTTOMRIGHT", wnd, -PADDING, -PADDING)
     resetBtn:SetText("Reset Layout")
     Theme.StyleLabel(resetBtn, 10, ALIGN.CENTER, Theme.Colors.TextMuted, false)
@@ -139,7 +182,7 @@ function SettingsPage:Init()
         Settings.data.positions = nil
         Settings:Save()
         if api.Log ~= nil and api.Log.Info ~= nil then
-            api.Log:Info("[Perfection UI] Layout coordinates reset to factory defaults.")
+            api.Log:Info("[Perfection UI] Layout coordinates reset to default.")
         end
     end)
 
@@ -148,8 +191,10 @@ function SettingsPage:Init()
 end
 
 function SettingsPage:RefreshCheckboxes()
-    for modId, chk in pairs(self.moduleCheckboxes) do
-        chk:SetChecked(Settings:IsModuleEnabled(modId))
+    for modId, data in pairs(self.moduleRows) do
+        if data.update then
+            data.update(Settings:IsModuleEnabled(modId))
+        end
     end
 end
 

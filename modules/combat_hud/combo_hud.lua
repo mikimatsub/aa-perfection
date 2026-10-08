@@ -35,7 +35,7 @@ function ComboHUD:Init()
 
     Mover:RegisterFrame("combo_hud", wnd, "Abyssal / Combo HUD")
     self.window = wnd
-    wnd:Show(true)
+    wnd:Show(false)
 end
 
 function ComboHUD:Update()
@@ -45,6 +45,14 @@ function ComboHUD:Update()
         curCharges = tonumber(rsc.charge or rsc.current or rsc.count or 0) or 0
     end
 
+    if curCharges <= 0 then
+        if self.window:IsVisible() then
+            self.window:Show(false)
+        end
+        return
+    end
+
+    self.window:Show(true)
     for i = 1, 4 do
         local orb = self.charges[i]
         if i <= curCharges then

@@ -62,16 +62,12 @@ function Mover:ShowOverlays()
                 overlay:AddAnchor("TOPLEFT", frame, 0, 0)
                 overlay:AddAnchor("BOTTOMRIGHT", frame, 0, 0)
                 
-                local border = overlay:CreateNinePartDrawable(TEXTURE_PATH.HUD, "overlay")
-                border:SetCoords(79, 203, 18, 23)
-                border:SetInset(4, 4, 4, 4)
-                border:SetColor(0.9, 0.7, 0.2, 0.9) -- Amber gold outline
-                border:AddAnchor("TOPLEFT", overlay, -2, -2)
-                border:AddAnchor("BOTTOMRIGHT", overlay, 2, 2)
+                Theme.ApplyBackdrop(overlay, { 0.1, 0.1, 0.15, 0.70 }, Theme.Colors.BorderAccent)
+                Theme.ApplyBorder(overlay, Theme.Colors.BorderAccent)
 
                 local label = overlay:CreateChildWidget("label", "label", 0, true)
                 label:SetText(entry.name)
-                Theme.StyleLabel(label, 12, ALIGN.CENTER, Theme.Colors.TextGold, true)
+                Theme.StyleLabel(label, 11, ALIGN.CENTER, Theme.Colors.TextGold, true)
                 label:AddAnchor("CENTER", overlay, 0, 0)
 
                 self.overlayWidgets[id] = overlay

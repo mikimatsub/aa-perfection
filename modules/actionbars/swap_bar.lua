@@ -50,8 +50,13 @@ function SwapBar:Init()
 
     Mover:RegisterFrame("swap_bar", wnd, "Quick Swap Bar")
     self.window = wnd
-    wnd:Show(true)
+    wnd:Show(false)
     self:Refresh()
+end
+
+function SwapBar:Toggle()
+    if self.window == nil then return end
+    self.window:Show(not self.window:IsVisible())
 end
 
 function SwapBar:Refresh()

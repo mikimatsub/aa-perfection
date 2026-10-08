@@ -81,11 +81,15 @@ function PlayerFrame:Init()
 end
 
 function PlayerFrame:Update()
-    local curHp = Guard.UnitHealth("player")
-    local maxHp = Guard.UnitMaxHealth("player")
-    local curMp = Guard.UnitMana("player")
-    local maxMp = Guard.UnitMaxMana("player")
-    local playerName = Guard.UnitName("player")
+    local curHp = Guard.UnitHealth("player") or 100
+    local maxHp = Guard.UnitMaxHealth("player") or 100
+    local curMp = Guard.UnitMana("player") or 100
+    local maxMp = Guard.UnitMaxMana("player") or 100
+    local playerName = Guard.UnitName("player") or "Player"
+    local level = Guard.UnitLevel("player")
+
+    if maxHp < 1 then maxHp = 1 end
+    if maxMp < 1 then maxMp = 1 end
 
     self.hpBar.statusBar:SetMinMaxValues(0, maxHp)
     self.hpBar.statusBar:SetValue(curHp)
@@ -96,6 +100,9 @@ function PlayerFrame:Update()
     local pct = math.floor((curHp / maxHp) * 100)
     self.hpLabel:SetText(string.format("%d / %d (%d%%)", curHp, maxHp, pct))
     self.nameLabel:SetText(playerName)
+    if self.levelLabel and level then
+        self.levelLabel:SetText(tostring(level))
+    end
 end
 
 return PlayerFrame

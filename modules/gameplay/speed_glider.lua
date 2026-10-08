@@ -26,7 +26,7 @@ function SpeedGlider:Init()
     self.speedLabel = lbl
 
     self.window = wnd
-    wnd:Show(true)
+    wnd:Show(false)
 end
 
 function SpeedGlider:Update(dtMs)
@@ -42,7 +42,13 @@ function SpeedGlider:Update(dtMs)
             local dz = z - self.lastZ
             local dist = math.sqrt((dx * dx) + (dy * dy) + (dz * dz))
             local speedMs = dist / elapsedSec
-            self.speedLabel:SetText(string.format("%.1f m/s", speedMs))
+
+            if speedMs > 0.5 then
+                self.speedLabel:SetText(string.format("%.1f m/s", speedMs))
+                self.window:Show(true)
+            else
+                self.window:Show(false)
+            end
 
             self.lastX = x
             self.lastY = y

@@ -22,14 +22,14 @@ local SLOT_GAP = 4
 local PADDING = 12
 
 function BagView:Init()
-    local x, y = Settings:GetPosition("inventory", 600, 200)
+    local x, y = Settings:GetPosition("inventory", 1150, 220)
 
     local wnd = api.Interface:CreateEmptyWindow("pui_bag_window", "UIParent")
     wnd:SetExtent((COLUMNS * (SLOT_SIZE + SLOT_GAP)) + (PADDING * 2) - SLOT_GAP, 580)
     wnd:AddAnchor("TOPLEFT", "UIParent", x, y)
     wnd:SetUILayer("game")
 
-    Theme.ApplyBackdrop(wnd, Theme.Colors.BgDark, Theme.Colors.BorderSubtle)
+    Theme.ApplyBackdrop(wnd, { 0.08, 0.09, 0.12, 0.96 }, Theme.Colors.BorderSubtle)
     Theme.ApplyBorder(wnd, Theme.Colors.BorderActive)
 
     -- Header Title

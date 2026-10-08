@@ -74,7 +74,7 @@ function QuestTracker:Init()
 
     Mover:RegisterFrame("quest_tracker", wnd, "Quest Tracker")
     self.window = wnd
-    wnd:Show(true)
+    wnd:Show(false)
     self:Refresh()
 end
 
@@ -92,7 +92,7 @@ function QuestTracker:ToggleCollapse()
 end
 
 function QuestTracker:Refresh()
-    if self.isCollapsed or self.window == nil then return end
+    if self.window == nil then return end
 
     local rowIndex = 1
     -- Query active quest IDs if Quest API is present
@@ -115,6 +115,13 @@ function QuestTracker:Refresh()
         end
     end
 
+    -- If no quests were populated, hide this window completely so native UI shines through
+    if rowIndex == 1 then
+        self.window:Show(false)
+        return
+    end
+
+    self.window:Show(true)
     -- Hide unused rows
     for i = rowIndex, self.maxQuests do
         self.questRows[i].widget:Show(false)

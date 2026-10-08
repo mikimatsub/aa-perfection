@@ -37,8 +37,15 @@ function Events:OnUpdate(rawDt)
             local elapsed = ticker.accum
             ticker.accum = 0
             local ok, err = pcall(ticker.cb, elapsed)
-            if not ok and api.Log ~= nil and api.Log.Err ~= nil then
-                api.Log:Err("[Perfection UI] Ticker error in '" .. tostring(id) .. "': " .. tostring(err))
+            if not ok then
+                if not ticker.hasErrored then
+                    ticker.hasErrored = true
+                    if api.Log ~= nil and api.Log.Err ~= nil then
+                        api.Log:Err("[Perfection UI] Ticker error in '" .. tostring(id) .. "': " .. tostring(err))
+                    end
+                end
+            else
+                ticker.hasErrored = false
             end
         end
     end
