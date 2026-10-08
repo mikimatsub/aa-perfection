@@ -56,17 +56,18 @@ Built from the ground up on verified AAClassic Addon API mechanics, it replaces 
 3. Click **Install**.
 4. Launch ArcheAge Classic.
 
-### Option 2: Manual Installation
-1. Download or clone this repository to your ArcheAge Classic addons directory:
+### Option 2: Direct / Manual Installation
+1. Download or clone this repository to your ArcheAge Classic Addon directory:
    ```text
-   Documents\AAClassic\addons\aa-perfection\
+   Documents\AAClassic\Addon\aa-perfection\
    ```
-2. Open or create `addons.txt` inside `Documents\AAClassic\addons\`.
+   *(Note: The folder is singular `Addon` with a capital 'A', e.g. `C:\AAClassic\Documents\Addon\` or `C:\Users\<User>\OneDrive\Documents\AAClassic\Addon\`)*
+2. Open or create `addons.txt` (plural `addons.txt`) inside `Documents\AAClassic\Addon\`.
 3. Add the line:
    ```text
    aa-perfection
    ```
-4. Launch ArcheAge Classic. On character login, you will see `[Perfection UI] Loaded successfully` in the chat window.
+4. Launch ArcheAge Classic. In the Character Selection screen, verify under **Player UI / Addons** that `aa-perfection` is listed and checked. On character login, you will see `[Perfection UI] Loaded successfully` in chat.
 
 ---
 
