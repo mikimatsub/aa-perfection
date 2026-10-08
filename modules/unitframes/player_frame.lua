@@ -29,10 +29,20 @@ local function formatThousands(n)
 end
 
 function PlayerFrame:Init()
-    -- Suppress stock player frame to avoid duplicates
+    -- Permanently banish stock player frame offscreen with 0 alpha
     local stockPlayer = Guard.GetStockContent(UIC.PLAYER_UNITFRAME)
     if stockPlayer ~= nil then
-        pcall(function() stockPlayer:Show(false) end)
+        pcall(function()
+            stockPlayer:SetAlpha(0)
+            stockPlayer:RemoveAllAnchors()
+            stockPlayer:AddAnchor("TOPLEFT", "UIParent", -3000, -3000)
+            stockPlayer:Show(false)
+            stockPlayer:SetHandler("OnShow", function()
+                stockPlayer:Show(false)
+                stockPlayer:RemoveAllAnchors()
+                stockPlayer:AddAnchor("TOPLEFT", "UIParent", -3000, -3000)
+            end)
+        end)
     end
 
     local x, y = Settings:GetPosition("player_frame", 450, 620)

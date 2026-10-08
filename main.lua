@@ -12,6 +12,7 @@ local SettingsPage = require("aa-perfection/core/settings_page")
 local BagView = require("aa-perfection/modules/inventory/bag_view")
 local SwapBar = require("aa-perfection/modules/actionbars/swap_bar")
 local BarSkinner = require("aa-perfection/modules/actionbars/bar_skinner")
+local MicroMenu = require("aa-perfection/modules/actionbars/micro_menu")
 local CastBar = require("aa-perfection/modules/combat_hud/castbar")
 local CCTracker = require("aa-perfection/modules/combat_hud/cc_tracker")
 local ComboHUD = require("aa-perfection/modules/combat_hud/combo_hud")
@@ -25,6 +26,7 @@ local Auras = require("aa-perfection/modules/unitframes/auras")
 local LaborHUD = require("aa-perfection/modules/gameplay/labor_hud")
 local SpeedGlider = require("aa-perfection/modules/gameplay/speed_glider")
 local TradeAssist = require("aa-perfection/modules/gameplay/trade_assist")
+local MinimapStyler = require("aa-perfection/modules/gameplay/minimap_styler")
 local QuestTracker = require("aa-perfection/modules/chat_quest/quest_tracker")
 local ChatStyler = require("aa-perfection/modules/chat_quest/chat_styler")
 
@@ -81,6 +83,7 @@ local function OnLoad()
 
     -- Initialize Feature Modules
     Logger:Try("BarSkinner:Init", function() BarSkinner:Init() end)
+    Logger:Try("MicroMenu:Init", function() MicroMenu:Init() end)
     Logger:Try("SwapBar:Init", function() SwapBar:Init() end)
     Logger:Try("BagView:Init", function() BagView:Init() end)
     Logger:Try("CastBar:Init", function() CastBar:Init() end)
@@ -96,6 +99,7 @@ local function OnLoad()
     Logger:Try("LaborHUD:Init", function() LaborHUD:Init() end)
     Logger:Try("SpeedGlider:Init", function() SpeedGlider:Init() end)
     Logger:Try("TradeAssist:Init", function() TradeAssist:Init() end)
+    Logger:Try("MinimapStyler:Init", function() MinimapStyler:Init() end)
     Logger:Try("QuestTracker:Init", function() QuestTracker:Init() end)
     Logger:Try("ChatStyler:Init", function() ChatStyler:Init() end)
 
@@ -132,13 +136,19 @@ local function OnLoad()
         end
     end)
 
-    -- Low-frequency ticker (500ms = 2 FPS): Labor, trade, and quests
+    -- Low-frequency ticker (500ms = 2 FPS): Labor, trade, radar, and quests
     Events:RegisterTicker("slow_gameplay", 500, function(dt)
         if Settings:IsModuleEnabled("gameplay") then
             LaborHUD:Update()
             TradeAssist:Update()
+            MinimapStyler:Update()
         end
-        QuestTracker:Refresh()
+        if Settings:IsModuleEnabled("chat") then
+            ChatStyler:Update()
+        end
+        if Settings:IsModuleEnabled("quest") then
+            QuestTracker:Refresh()
+        end
     end)
 
     -- Engine event subscriptions
@@ -169,6 +179,8 @@ local function OnUnload()
     if SpeedGlider.window ~= nil then SpeedGlider.window:Show(false) end
     if TradeAssist.window ~= nil then TradeAssist.window:Show(false) end
     if SwapBar.window ~= nil then SwapBar.window:Show(false) end
+    if MicroMenu.window ~= nil then MicroMenu.window:Show(false) end
+    if MinimapStyler.window ~= nil then MinimapStyler.window:Show(false) end
     if QuestTracker.window ~= nil then QuestTracker.window:Show(false) end
     if SettingsPage.window ~= nil then SettingsPage.window:Show(false) end
     Logger:Info("Unloaded cleanly.")

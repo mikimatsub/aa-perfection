@@ -13,16 +13,20 @@ local defaults = {
         unitframes  = true,
         actionbars  = true,
         gameplay    = true,
-        chat        = true
+        chat        = true,
+        quest       = true
     },
     positions = {
-        player_frame = { x = 450, y = 620 },
-        target_frame = { x = 850, y = 620 },
-        castbar      = { x = 650, y = 560 },
-        combo_hud    = { x = 650, y = 500 },
-        inventory    = { x = 700, y = 200 },
-        labor_hud    = { x = 20, y = 20 },
-        swap_bar     = { x = 650, y = 780 }
+        player_frame  = { x = 450, y = 620 },
+        target_frame  = { x = 850, y = 620 },
+        castbar       = { x = 650, y = 560 },
+        combo_hud     = { x = 650, y = 500 },
+        inventory     = { x = 700, y = 200 },
+        labor_hud     = { x = 20, y = 20 },
+        swap_bar      = { x = 650, y = 780 },
+        micro_menu    = { x = 1630, y = 1040 },
+        quest_tracker = { x = 1630, y = 180 },
+        minimap_hud   = { x = 1700, y = 20 }
     },
     ui = {
         scale = 1.0,

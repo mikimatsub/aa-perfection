@@ -10,7 +10,7 @@ local SettingsPage = {
 }
 
 local WIDTH = 440
-local HEIGHT = 480
+local HEIGHT = 520
 local PADDING = 16
 
 function SettingsPage:Init()
@@ -52,9 +52,10 @@ function SettingsPage:Init()
         { id = "inventory",   label = "Obsidian Bag Styling",           desc = "Dark obsidian theme on native bags" },
         { id = "unitframes",  label = "Obsidian Unit Frames",           desc = "Player & Target frames with health/mana" },
         { id = "combat_hud",  label = "Combat HUD & 3D Target Plate",   desc = "Cast bar, CC alerts, & 3D overhead plate" },
-        { id = "actionbars",  label = "Quick Swap Loadout Bar",         desc = "Floating situational weapon quick-swap" },
-        { id = "gameplay",    label = "Labor HUD & Speedometer",        desc = "Live labor power bar & mount/glider speed" },
-        { id = "chat",        label = "Chat Tab Enhancements",          desc = "Obsidian styling for chat windows" }
+        { id = "actionbars",  label = "Quick Swap & Micro Bar",         desc = "Floating weapon swap & modern shortcuts" },
+        { id = "gameplay",    label = "Labor HUD & Radar HUD",          desc = "Labor power, speedometer & minimap coords" },
+        { id = "chat",        label = "Chat Tab Enhancements",          desc = "Obsidian styling for chat windows" },
+        { id = "quest",       label = "Objectives Tracker",             desc = "Obsidian quest tracker with rift counters" }
     }
 
     local startY = PADDING + 20 + 4 + 14 + 12

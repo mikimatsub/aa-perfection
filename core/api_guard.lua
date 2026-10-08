@@ -95,6 +95,14 @@ function Guard.UnitScreenPosition(unit)
     return nil, nil, nil
 end
 
+function Guard.UnitScreenNameTagOffset(unit)
+    local u = sanitizeUnit(unit)
+    if not u or api.Unit == nil or api.Unit.GetUnitScreenNameTagOffset == nil then return nil, nil, nil end
+    local ok, sx, sy, sz = pcall(function() return api.Unit:GetUnitScreenNameTagOffset(u) end)
+    if ok and sx ~= nil then return sx, sy, sz end
+    return nil, nil, nil
+end
+
 function Guard.UnitDistance(unit)
     local u = sanitizeUnit(unit)
     if not u or api.Unit == nil or api.Unit.UnitDistance == nil then return nil end

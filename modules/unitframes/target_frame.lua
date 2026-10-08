@@ -14,7 +14,7 @@ local TargetFrame = {
     levelLabel = nil
 }
 
-local WIDTH = 224
+local WIDTH = 240
 local HEIGHT = 56
 
 local function formatThousands(n)
@@ -29,10 +29,20 @@ local function formatThousands(n)
 end
 
 function TargetFrame:Init()
-    -- Suppress stock target frame
+    -- Permanently banish stock target frame offscreen with 0 alpha
     local stockTarget = Guard.GetStockContent(UIC.TARGET_UNITFRAME)
     if stockTarget ~= nil then
-        pcall(function() stockTarget:Show(false) end)
+        pcall(function()
+            stockTarget:SetAlpha(0)
+            stockTarget:RemoveAllAnchors()
+            stockTarget:AddAnchor("TOPLEFT", "UIParent", -3000, -3000)
+            stockTarget:Show(false)
+            stockTarget:SetHandler("OnShow", function()
+                stockTarget:Show(false)
+                stockTarget:RemoveAllAnchors()
+                stockTarget:AddAnchor("TOPLEFT", "UIParent", -3000, -3000)
+            end)
+        end)
     end
 
     local x, y = Settings:GetPosition("target_frame", 850, 620)
@@ -52,11 +62,12 @@ function TargetFrame:Init()
     Theme.StyleLabel(lvl, 11, ALIGN.LEFT, Theme.Colors.TextGold, true)
     self.levelLabel = lvl
 
-    -- Target Name
+    -- Target Name (Fixed width with no overlap)
     local name = wnd:CreateChildWidget("label", "name", 0, true)
-    name:SetExtent(130, 16)
+    name:SetExtent(144, 16)
     name:AddAnchor("LEFT", lvl, "RIGHT", 4, 0)
     Theme.StyleLabel(name, 12, ALIGN.LEFT, Theme.Colors.TextPrimary, true)
+    name:SetAutoResize(false)
     self.nameLabel = name
 
     -- Distance (Top Right)
