@@ -21,11 +21,13 @@ function BarSkinner:ScanAndSkin()
     end
 
     -- 2. Inspect common action bar globals
-    local barGlobals = { "actionBar", "actionBars", "mainActionBar", "subActionBar", "petActionBar" }
-    for _, gName in ipairs(barGlobals) do
-        local globalVal = _G[gName]
-        if type(globalVal) == "table" then
-            self:SkinFrame(globalVal)
+    if _G ~= nil then
+        local barGlobals = { "actionBar", "actionBars", "mainActionBar", "subActionBar", "petActionBar" }
+        for _, gName in ipairs(barGlobals) do
+            local globalVal = _G[gName]
+            if type(globalVal) == "table" then
+                self:SkinFrame(globalVal)
+            end
         end
     end
 
