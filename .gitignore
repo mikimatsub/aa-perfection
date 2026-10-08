@@ -16,3 +16,4 @@ $RECYCLE.BIN/
 # Local runtime data / logs
 *.log
 .data/
+*.zip
