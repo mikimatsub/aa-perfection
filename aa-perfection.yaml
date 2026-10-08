@@ -1,0 +1,21 @@
+name: aa-perfection
+alias: Perfection UI
+description: The definitive modern UI overhaul for ArcheAge Classic. Zero-setup, Obsidian tactical HUD, next-gen smart categorized inventory, crisp unit frames, combat castbar, and naval/trade HUD.
+author: Antigravity
+repo: aa-perfection/aa-perfection
+branch: main
+tags:
+  - UI
+  - Combat
+  - Inventory
+  - QoL
+keywords:
+  - ui
+  - interface
+  - overhaul
+  - hud
+  - inventory
+  - unitframes
+  - castbar
+  - trade
+  - bags
